@@ -3,8 +3,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import PatientIntakeForm from "@/components/PatientIntakeForm";
 import SimulationDashboard from "@/components/SimulationDashboard";
 import ReportView from "@/components/ReportView";
-import { PatientData, KidneyMetrics, Treatment } from "@/lib/kidney-simulation";
-import { Activity, Shield, Zap } from "lucide-react";
+import { PatientData, KidneyMetrics, Treatment, DrugInteraction, TreatmentRanking } from "@/lib/kidney-simulation";
+import { Activity, Shield, Zap, Brain, HeartPulse } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type View = "landing" | "intake" | "simulation" | "report";
@@ -14,7 +14,9 @@ interface ReportData {
   baseline: KidneyMetrics;
   simulated: KidneyMetrics | null;
   treatments: Treatment[];
-  adjustments: { hydration: number; proteinIntake: number; saltIntake: number };
+  adjustments: { hydration: number; proteinIntake: number; saltIntake: number; waterIntake: number; exerciseLevel: number };
+  drugInteractions: DrugInteraction[];
+  treatmentRankings: TreatmentRanking[];
 }
 
 export default function Index() {
@@ -43,7 +45,6 @@ export default function Index() {
             exit={{ opacity: 0 }}
             className="min-h-screen flex flex-col"
           >
-            {/* Hero */}
             <div className="relative flex-1 flex items-center justify-center px-6 overflow-hidden">
               <div className="gradient-glow absolute inset-0 pointer-events-none" />
               <div className="relative text-center max-w-2xl mx-auto">
@@ -53,8 +54,8 @@ export default function Index() {
                   transition={{ delay: 0.1 }}
                   className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-accent text-accent-foreground text-sm font-medium mb-6"
                 >
-                  <Activity className="w-4 h-4" />
-                  AI-Powered Kidney Simulation
+                  <Brain className="w-4 h-4" />
+                  AI-Powered Digital Twin Technology
                 </motion.div>
 
                 <motion.h1
@@ -73,7 +74,7 @@ export default function Index() {
                   transition={{ delay: 0.3 }}
                   className="text-lg text-muted-foreground mt-5 max-w-lg mx-auto"
                 >
-                  Create a personalized kidney simulation, test treatments in real-time, and generate comprehensive health reports.
+                  Advanced 3D kidney simulation with drug interaction detection, AI treatment ranking, risk heatmaps, and predictive analytics.
                 </motion.p>
 
                 <motion.div
@@ -91,7 +92,6 @@ export default function Index() {
                   </Button>
                 </motion.div>
 
-                {/* Feature pills */}
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -99,9 +99,11 @@ export default function Index() {
                   className="flex flex-wrap items-center justify-center gap-4 mt-12"
                 >
                   {[
-                    { icon: Activity, text: "Real-time Metrics" },
-                    { icon: Zap, text: "Treatment Simulation" },
-                    { icon: Shield, text: "Risk Analysis" },
+                    { icon: HeartPulse, text: "3D Interactive Model" },
+                    { icon: Activity, text: "30+ Biomarkers" },
+                    { icon: Zap, text: "Drug Interaction Alerts" },
+                    { icon: Brain, text: "AI Treatment Ranking" },
+                    { icon: Shield, text: "Risk Heatmaps" },
                   ].map(({ icon: Icon, text }) => (
                     <div key={text} className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Icon className="w-4 h-4 text-primary" />
@@ -161,6 +163,8 @@ export default function Index() {
               simulated={reportData.simulated}
               treatments={reportData.treatments}
               adjustments={reportData.adjustments}
+              drugInteractions={reportData.drugInteractions}
+              treatmentRankings={reportData.treatmentRankings}
               onBack={() => setView("simulation")}
             />
           </motion.div>

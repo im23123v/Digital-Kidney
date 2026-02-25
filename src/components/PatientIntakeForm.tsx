@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { PatientData } from "@/lib/kidney-simulation";
-import { User, Heart, Droplets, Activity, Pill, FileText, ArrowRight } from "lucide-react";
+import { User, Heart, Droplets, Activity, Pill, FileText, ArrowRight, Beaker, Wind } from "lucide-react";
 
 interface PatientIntakeFormProps {
   onSubmit: (data: PatientData) => void;
@@ -22,6 +22,10 @@ const CONDITIONS = [
   { id: "gout", label: "Gout" },
   { id: "heart_disease", label: "Heart Disease" },
   { id: "obesity", label: "Obesity" },
+  { id: "anemia", label: "Anemia" },
+  { id: "lupus", label: "Lupus / Autoimmune" },
+  { id: "polycystic", label: "Polycystic Kidney Disease" },
+  { id: "liver_disease", label: "Liver Disease" },
 ];
 
 export default function PatientIntakeForm({ onSubmit }: PatientIntakeFormProps) {
@@ -42,10 +46,26 @@ export default function PatientIntakeForm({ onSubmit }: PatientIntakeFormProps) 
     serumCalcium: "",
     serumPotassium: "",
     serumSodium: "",
+    serumPhosphorus: "",
+    serumAlbumin: "",
+    hemoglobin: "",
+    hba1c: "",
+    cholesterol: "",
+    triglycerides: "",
+    urineProtein: "",
+    urineAlbumin: "",
+    egfrCysC: "",
+    parathyroidHormone: "",
+    vitaminD: "",
+    cReactiveProtein: "",
     existingConditions: [] as string[],
     currentMedicines: "",
     proteinIntake: "",
     saltIntake: "",
+    waterIntake: "",
+    exerciseLevel: 3,
+    smokingStatus: "never" as "never" | "former" | "current",
+    alcoholUnitsPerWeek: "",
   });
 
   const updateField = (field: string, value: any) => setForm((f) => ({ ...f, [field]: value }));
@@ -76,10 +96,26 @@ export default function PatientIntakeForm({ onSubmit }: PatientIntakeFormProps) 
       serumCalcium: Number(form.serumCalcium) || 9.5,
       serumPotassium: Number(form.serumPotassium) || 4.2,
       serumSodium: Number(form.serumSodium) || 140,
+      serumPhosphorus: Number(form.serumPhosphorus) || 3.8,
+      serumAlbumin: Number(form.serumAlbumin) || 4.0,
+      hemoglobin: Number(form.hemoglobin) || (form.gender === "female" ? 13 : 14.5),
+      hba1c: Number(form.hba1c) || 5.5,
+      cholesterol: Number(form.cholesterol) || 180,
+      triglycerides: Number(form.triglycerides) || 120,
+      urineProtein: Number(form.urineProtein) || 50,
+      urineAlbumin: Number(form.urineAlbumin) || 15,
+      egfrCysC: Number(form.egfrCysC) || 0,
+      parathyroidHormone: Number(form.parathyroidHormone) || 45,
+      vitaminD: Number(form.vitaminD) || 35,
+      cReactiveProtein: Number(form.cReactiveProtein) || 1.0,
       existingConditions: form.existingConditions,
       currentMedicines: form.currentMedicines ? form.currentMedicines.split(",").map((m) => m.trim()) : [],
       proteinIntake: Number(form.proteinIntake) || 60,
       saltIntake: Number(form.saltIntake) || 5,
+      waterIntake: Number(form.waterIntake) || 2.0,
+      exerciseLevel: form.exerciseLevel,
+      smokingStatus: form.smokingStatus,
+      alcoholUnitsPerWeek: Number(form.alcoholUnitsPerWeek) || 0,
     };
     onSubmit(data);
   };
@@ -160,6 +196,58 @@ export default function PatientIntakeForm({ onSubmit }: PatientIntakeFormProps) 
             <Label>Serum Sodium (mmol/L)</Label>
             <Input type="number" placeholder="140" value={form.serumSodium} onChange={(e) => updateField("serumSodium", e.target.value)} className="mt-1.5" />
           </div>
+          <div>
+            <Label>Serum Phosphorus (mg/dL)</Label>
+            <Input type="number" step="0.1" placeholder="3.8" value={form.serumPhosphorus} onChange={(e) => updateField("serumPhosphorus", e.target.value)} className="mt-1.5" />
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: "Advanced Blood Markers",
+      icon: Beaker,
+      content: (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div>
+            <Label>Serum Albumin (g/dL)</Label>
+            <Input type="number" step="0.1" placeholder="4.0" value={form.serumAlbumin} onChange={(e) => updateField("serumAlbumin", e.target.value)} className="mt-1.5" />
+          </div>
+          <div>
+            <Label>Hemoglobin (g/dL)</Label>
+            <Input type="number" step="0.1" placeholder="14" value={form.hemoglobin} onChange={(e) => updateField("hemoglobin", e.target.value)} className="mt-1.5" />
+          </div>
+          <div>
+            <Label>HbA1c (%)</Label>
+            <Input type="number" step="0.1" placeholder="5.5" value={form.hba1c} onChange={(e) => updateField("hba1c", e.target.value)} className="mt-1.5" />
+          </div>
+          <div>
+            <Label>Cholesterol (mg/dL)</Label>
+            <Input type="number" placeholder="180" value={form.cholesterol} onChange={(e) => updateField("cholesterol", e.target.value)} className="mt-1.5" />
+          </div>
+          <div>
+            <Label>Triglycerides (mg/dL)</Label>
+            <Input type="number" placeholder="120" value={form.triglycerides} onChange={(e) => updateField("triglycerides", e.target.value)} className="mt-1.5" />
+          </div>
+          <div>
+            <Label>C-Reactive Protein (mg/L)</Label>
+            <Input type="number" step="0.1" placeholder="1.0" value={form.cReactiveProtein} onChange={(e) => updateField("cReactiveProtein", e.target.value)} className="mt-1.5" />
+          </div>
+          <div>
+            <Label>Parathyroid Hormone (pg/mL)</Label>
+            <Input type="number" placeholder="45" value={form.parathyroidHormone} onChange={(e) => updateField("parathyroidHormone", e.target.value)} className="mt-1.5" />
+          </div>
+          <div>
+            <Label>Vitamin D (ng/mL)</Label>
+            <Input type="number" placeholder="35" value={form.vitaminD} onChange={(e) => updateField("vitaminD", e.target.value)} className="mt-1.5" />
+          </div>
+          <div>
+            <Label>Urine Protein (mg/day)</Label>
+            <Input type="number" placeholder="50" value={form.urineProtein} onChange={(e) => updateField("urineProtein", e.target.value)} className="mt-1.5" />
+          </div>
+          <div>
+            <Label>Urine Albumin (mg/day)</Label>
+            <Input type="number" placeholder="15" value={form.urineAlbumin} onChange={(e) => updateField("urineAlbumin", e.target.value)} className="mt-1.5" />
+          </div>
         </div>
       ),
     },
@@ -168,22 +256,25 @@ export default function PatientIntakeForm({ onSubmit }: PatientIntakeFormProps) 
       icon: Activity,
       content: (
         <div className="space-y-6">
-          <div>
-            <Label className="mb-3 block">Hydration Level</Label>
-            <div className="flex items-center gap-4">
-              <Droplets className="w-5 h-5 text-medical-blue" />
-              <Slider
-                value={[form.hydrationLevel]}
-                onValueChange={([v]) => updateField("hydrationLevel", v)}
-                min={1}
-                max={10}
-                step={1}
-                className="flex-1"
-              />
-              <span className="font-mono text-sm font-medium w-8 text-right">{form.hydrationLevel}/10</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <Label className="mb-3 block">Hydration Level</Label>
+              <div className="flex items-center gap-4">
+                <Droplets className="w-5 h-5 text-medical-blue" />
+                <Slider value={[form.hydrationLevel]} onValueChange={([v]) => updateField("hydrationLevel", v)} min={1} max={10} step={1} className="flex-1" />
+                <span className="font-mono text-sm font-medium w-8 text-right">{form.hydrationLevel}/10</span>
+              </div>
+            </div>
+            <div>
+              <Label className="mb-3 block">Exercise Level</Label>
+              <div className="flex items-center gap-4">
+                <Wind className="w-5 h-5 text-medical-green" />
+                <Slider value={[form.exerciseLevel]} onValueChange={([v]) => updateField("exerciseLevel", v)} min={0} max={10} step={1} className="flex-1" />
+                <span className="font-mono text-sm font-medium w-8 text-right">{form.exerciseLevel}/10</span>
+              </div>
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             <div>
               <Label>Protein Intake (g/day)</Label>
               <Input type="number" placeholder="60" value={form.proteinIntake} onChange={(e) => updateField("proteinIntake", e.target.value)} className="mt-1.5" />
@@ -192,16 +283,34 @@ export default function PatientIntakeForm({ onSubmit }: PatientIntakeFormProps) 
               <Label>Salt Intake (g/day)</Label>
               <Input type="number" step="0.5" placeholder="5" value={form.saltIntake} onChange={(e) => updateField("saltIntake", e.target.value)} className="mt-1.5" />
             </div>
+            <div>
+              <Label>Water Intake (L/day)</Label>
+              <Input type="number" step="0.5" placeholder="2.0" value={form.waterIntake} onChange={(e) => updateField("waterIntake", e.target.value)} className="mt-1.5" />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <Label>Smoking Status</Label>
+              <Select value={form.smokingStatus} onValueChange={(v) => updateField("smokingStatus", v)}>
+                <SelectTrigger className="mt-1.5"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="never">Never</SelectItem>
+                  <SelectItem value="former">Former</SelectItem>
+                  <SelectItem value="current">Current</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Alcohol (units/week)</Label>
+              <Input type="number" placeholder="0" value={form.alcoholUnitsPerWeek} onChange={(e) => updateField("alcoholUnitsPerWeek", e.target.value)} className="mt-1.5" />
+            </div>
           </div>
           <div>
             <Label className="mb-3 block">Existing Conditions</Label>
             <div className="grid grid-cols-2 gap-3">
               {CONDITIONS.map((c) => (
                 <label key={c.id} className="flex items-center gap-2.5 p-2.5 rounded-lg border border-border hover:bg-secondary/50 cursor-pointer transition-colors">
-                  <Checkbox
-                    checked={form.existingConditions.includes(c.id)}
-                    onCheckedChange={() => toggleCondition(c.id)}
-                  />
+                  <Checkbox checked={form.existingConditions.includes(c.id)} onCheckedChange={() => toggleCondition(c.id)} />
                   <span className="text-sm">{c.label}</span>
                 </label>
               ))}
@@ -229,7 +338,6 @@ export default function PatientIntakeForm({ onSubmit }: PatientIntakeFormProps) 
 
   return (
     <div className="w-full max-w-2xl mx-auto">
-      {/* Step indicators */}
       <div className="flex items-center justify-center gap-2 mb-8">
         {steps.map((s, i) => (
           <button
@@ -269,11 +377,7 @@ export default function PatientIntakeForm({ onSubmit }: PatientIntakeFormProps) 
         {currentStep.content}
 
         <div className="flex justify-between mt-8 pt-5 border-t border-border">
-          <Button
-            variant="outline"
-            onClick={() => setStep((s) => s - 1)}
-            disabled={step === 0}
-          >
+          <Button variant="outline" onClick={() => setStep((s) => s - 1)} disabled={step === 0}>
             Back
           </Button>
           {step < steps.length - 1 ? (
